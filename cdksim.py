@@ -269,7 +269,8 @@ class CpInet(threading.Thread):
                 print 'inet_connect: successful'
                 
             self.enter_state(CpInetState.IDLE, CpInetTimeout.IDLE)
-            self.watchdog_set_status(CpWatchdogStatus.Success)
+            if CpDefs.WatchdogWaitNetworkInterface == True:
+            	self.watchdog_set_status(CpWatchdogStatus.Success)
             return True
         except:         
             self.log.logError('inet_connect: failed')
@@ -338,8 +339,10 @@ class CpInet(threading.Thread):
                 self.commands.task_done()
             else:
                 print 'inet_send error: %s' % result.Data
-                self.enqueue_packet(packet)
-                self.handle_inet_send_error()
+
+                if CpDefs.InetSendRetry == True:
+	                self.enqueue_packet(packet)
+	                self.handle_inet_send_error()
                 #print 'tasks in queue %d' % self.commands.qsize()
                 #print 'error: ResultCode=(%d) Data=%s ' % (result.ResultCode, result.Data)
                 
@@ -568,7 +571,10 @@ if __name__ == '__main__':
         	print 'enter RO:'
         	ro = raw_input(">>")
 
-        	print 'This was entered ', vin,  ' and ', ro
+        	packet = CpDefs.InetPacket % (vin, ro)
+
+        	print 'Sending: ', packet
+        	inetThread.enqueue_packet(packet)
         elif input == '0':
             inetThread.enqueue_packet("{VIN: 0123456789abcdefg, RO: 123456, OpCode: UNI-INSPECT}")
         elif input == '1':

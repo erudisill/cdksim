@@ -35,7 +35,9 @@ class CpDefs:
     #InetRoute = "/api/bitstorm/ping"
     InetRoute = "/api/andemo/steponecdk"
     InetPostParams = "POST %s HTTP/1.1\r\ncontent-type:application/json\r\nhost: %s\r\ncontent-length:%d\r\n\r\n%s"
+    InetPacket = "{VIN: %s, RO: %s, OpCode: UNI-INSPECT}"
     InetTimeout = 5
+    InetSendRetry = False
     WatchdogFilePath = "/home/root/watchdog/info.txt"
     WatchdogWaitNetworkInterface = False
     Encoding = CpEncoding.CpJsonCustomBase64
