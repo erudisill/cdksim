@@ -48,7 +48,7 @@ class CpInetTimeout:
     IDLE = 30
     CONNECT = 5
     CLOSE = 0
-    SLEEP = 30
+    SLEEP = 5
     SEND = 5
     WAITNETWORKINTERFACE = 120
     
@@ -69,6 +69,12 @@ class CpInetResult:
 class CpWatchdogStatus:
     Success = "1"
     Error = "2"
+
+class CpInetPacket:
+	Route = ""
+	Data = ""
+
+
     
 class CpInet(threading.Thread):
     
@@ -384,7 +390,9 @@ class CpInet(threading.Thread):
         
         # Setup the HTTP request
         postData = CpInetDefs.INET_HTTPPOST % (CpInetDefs.INET_ROUTE, CpInetDefs.INET_HOST, len(packet), packet)
-        
+        #postData = CpInetDefs.INET_HTTPPOST % (packet.Route, CpInetDefs.INET_HOST, len(packet.Data), packet.Data)
+
+        print "PostData: ", postData
         result = CpInetResultCode()
         
         if(CpDefs.LogVerboseInet):
@@ -548,9 +556,12 @@ def inetDataReceived(data):
     #print 'Callback function inetDataReceived ', data
     pass
     
+
+
 if __name__ == '__main__':
     inetThread = CpInet(inetDataReceived)
     inetThread.start()   
+    
     
     
     while True:
@@ -566,15 +577,26 @@ if __name__ == '__main__':
             print "Exiting app"
             break
         elif input == 'cdk':
-        	print 'enter VIN:'
-        	vin = raw_input(">>")
-        	print 'enter RO:'
-        	ro = raw_input(">>")
+        	print 'Enter Step:'
+        	cdk_step = raw_input(">>")
+        	print 'Enter VIN:'
+        	cdk_vin = raw_input(">>")
+        	print 'Enter RO:'
+        	cdk_ro = raw_input(">>")
 
-        	packet = CpDefs.InetPacket % (vin, ro)
+        	if cdk_step == "1":
+        		route = "/api/andemo/steponecdk"
+        	elif cdk_step == "2":
+        		route = "/api/andemo/steptwocdk"
 
-        	print 'Sending: ', packet
-        	inetThread.enqueue_packet(packet)
+
+			data = CpDefs.InetJsonTemplate % (cdk_vin, cdk_ro)
+
+
+			print "data: ", data
+			#inetThread.enqueue_packet(data)
+        	inetThread.enqueue_packet(CpDefs.InetJsonTemplate % (cdk_vin, cdk_ro))
+
         elif input == '0':
             inetThread.enqueue_packet("{VIN: 0123456789abcdefg, RO: 123456, OpCode: UNI-INSPECT}")
         elif input == '1':
