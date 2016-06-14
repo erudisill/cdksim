@@ -594,7 +594,11 @@ if __name__ == '__main__':
 
 
 			print "data: ", data
+
+			# TODO: the following line does not work
 			#inetThread.enqueue_packet(data)
+
+			#TODO: the following line does work
         	inetThread.enqueue_packet(CpDefs.InetJsonTemplate % (cdk_vin, cdk_ro))
 
         elif input == '0':
