@@ -1,3 +1,5 @@
+import random
+import string
 import threading
 import time
 from datetime import datetime
@@ -581,8 +583,9 @@ if __name__ == '__main__':
         	cdk_step = raw_input(">>")
         	print 'Enter VIN:'
         	cdk_vin = raw_input(">>")
-        	print 'Enter RO:'
-        	cdk_ro = raw_input(">>")
+                cdk_ro = random.choice('123456789') + \
+                            ''.join(random.choice(string.digits) for _ in range(5))
+        	print 'RO:', cdk_ro
 
         	if cdk_step == "1":
         		route = "/api/andemo/steponecdk"
