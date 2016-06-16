@@ -391,7 +391,8 @@ class CpInet(threading.Thread):
     def inet_send_packet(self, packet):
         
         # Setup the HTTP request
-        postData = CpInetDefs.INET_HTTPPOST % (CpInetDefs.INET_ROUTE, CpInetDefs.INET_HOST, len(packet), packet)
+        postData = CpInetDefs.INET_HTTPPOST % (self.route, CpInetDefs.INET_HOST, len(packet), packet)
+        #postData = CpInetDefs.INET_HTTPPOST % (CpInetDefs.INET_ROUTE, CpInetDefs.INET_HOST, len(packet), packet)
         #postData = CpInetDefs.INET_HTTPPOST % (packet.Route, CpInetDefs.INET_HOST, len(packet.Data), packet.Data)
 
         print "PostData: ", postData
@@ -580,29 +581,39 @@ if __name__ == '__main__':
             break
         elif input == 'cdk':
         	print 'Enter Step:'
-        	cdk_step = raw_input(">>")
-        	print 'Enter VIN:'
-        	cdk_vin = raw_input(">>")
-                cdk_ro = random.choice('123456789') + \
-                            ''.join(random.choice(string.digits) for _ in range(5))
-        	print 'RO:', cdk_ro
+                cdk_step = raw_input(">>")
 
         	if cdk_step == "1":
-        		route = "/api/andemo/steponecdk"
-        	elif cdk_step == "2":
-        		route = "/api/andemo/steptwocdk"
+                    inetThread.route = "/api/andemo/steponecdk"
+                    print 'Enter VIN:'
+                    cdk_vin = raw_input(">>")
+                    cdk_ro = random.choice('123456789') + \
+                                ''.join(random.choice(string.digits) for _ in range(5))
+                    print 'Generated RO:', cdk_ro
+        	    print
+                    print
 
+                    data = CpDefs.InetJsonTemplate % (cdk_vin, cdk_ro)
+                    inetThread.enqueue_packet(CpDefs.InetJsonTemplate % (cdk_vin, cdk_ro))
 
-			data = CpDefs.InetJsonTemplate % (cdk_vin, cdk_ro)
+                elif cdk_step == "2":
+                    inetThread.route = "/api/andemo/steptwocdk"
+                    print 'Enter RO:'
+                    cdk_ro = raw_input(">>")
+                    print 'Enter UNI-codes:'
+                    cdk_uni = raw_input(">>")
 
+                    step2_data = '{ "RO": "%s", "UNICODES": "%s" }' % \
+                                (cdk_ro, cdk_uni)
+                    print step2_data
 
-			print "data: ", data
+                    inetThread.enqueue_packet(step2_data)
 
+			#print "data: ", data
 			# TODO: the following line does not work
 			#inetThread.enqueue_packet(data)
-
 			#TODO: the following line does work
-        	inetThread.enqueue_packet(CpDefs.InetJsonTemplate % (cdk_vin, cdk_ro))
+
 
         elif input == '0':
             inetThread.enqueue_packet("{VIN: 0123456789abcdefg, RO: 123456, OpCode: UNI-INSPECT}")
